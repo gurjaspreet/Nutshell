@@ -1,30 +1,37 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
-	"github.com/codecrafters-io/shell-starter-go/internal/shell"
+	"github.com/chzyer/readline"
+	"github.com/gurjaspreet/Nutshell/internal/shell"
 )
 
 func main() {
 	shellApp := shell.New()
-	reader := bufio.NewReader(os.Stdin)
+
+	completer := shell.NewWordCompleter()
+
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:       "$ ",
+		AutoComplete: completer,
+	})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error initializing shell:", err)
+		os.Exit(1)
+	}
+	defer rl.Close()
 
 	for {
-		fmt.Print("$ ")
-
-		line, err := reader.ReadString('\n')
-		line = strings.TrimRight(line, "\r\n")
+		line, err := rl.Readline()
 		if line != "" && shellApp.ExecuteLine(line) {
 			return
 		}
 
 		if err != nil {
-			if err != io.EOF {
+			if err != io.EOF && err != readline.ErrInterrupt {
 				fmt.Fprintln(os.Stderr, "Error reading input:", err)
 			}
 			return

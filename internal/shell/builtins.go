@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var supportedCommands = []string{"cd", "echo", "exit", "pwd", "type"}
+var supportedCommands = []string{"cd", "echo", "exit", "pwd", "type", "refresh"}
 
 func runBuiltin(command string, args []string, redirection Redirection) bool {
 	switch command {
@@ -18,6 +18,8 @@ func runBuiltin(command string, args []string, redirection Redirection) bool {
 		echo(args, redirection)
 	case "pwd":
 		printWorkingDirectory(redirection)
+	case "refresh":
+		refreshPathExecutables()
 	case "type":
 		if len(args) > 0 {
 			commandType(args[0], redirection)
